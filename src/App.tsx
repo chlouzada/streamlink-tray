@@ -6,20 +6,22 @@ function App() {
   const [name, setName] = useState('');
 
   async function open_stream(name: string) {
+    console.log('aqui', name);
     await invoke('open_stream', { input: name });
+    console.log('after');
   }
 
   return (
-    <div className="container">
+    <div className="flex flex-col justify-center h-full">
       <form
-        className="row"
+        className="flex justify-center"
         onSubmit={(e) => {
           e.preventDefault();
           open_stream(name);
         }}
       >
         <input
-          id="greet-input"
+          className="mr-2"
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Enter a username..."
         />

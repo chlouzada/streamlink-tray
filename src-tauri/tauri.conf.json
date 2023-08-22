@@ -36,10 +36,14 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
+        "resizable": false,
+        "minimizable": false,
+        "center": true,
+        "alwaysOnTop": true,
         "title": "streamlink-tray",
-        "width": 800,
-        "height": 600
+        "width": 400,
+        "height": 300,
+        "visible": true
       }
     ],
     "systemTray": {
