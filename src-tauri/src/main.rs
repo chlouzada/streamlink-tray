@@ -2,7 +2,9 @@
 
 use std::process::Command;
 use std::thread;
-use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 
 #[tauri::command]
 fn open_stream(input: &str) {
@@ -43,8 +45,12 @@ fn close_all_streams() {
 }
 
 fn main() {
+    let open = CustomMenuItem::new("open".to_string(), "Open");
+    let close_all = CustomMenuItem::new("close_all".to_string(), "Close All");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
+        .add_item(open)
+        .add_item(close_all)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -76,6 +82,13 @@ fn main() {
                 println!("system tray received a double click");
             }
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "open" => {
+                    let window = app.get_window("main").unwrap();
+                    window.show().unwrap();
+                }
+                "close_all" => {
+                    close_all_streams();
+                }
                 "quit" => {
                     app.exit(0);
                 }
@@ -83,6 +96,13 @@ fn main() {
                     println!("Clicked on menu item {}", id);
                 }
             },
+            _ => {}
+        })
+        .on_window_event(|event| match event.event() {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                event.window().hide().unwrap();
+                api.prevent_close();
+            }
             _ => {}
         })
         .run(tauri::generate_context!())
