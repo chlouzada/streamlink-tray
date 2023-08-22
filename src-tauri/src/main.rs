@@ -3,6 +3,8 @@
 
 use std::process::Command;
 use std::thread;
+use tauri::Manager;
+use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -47,8 +49,62 @@ fn close_all_streams() {
 }
 
 fn main() {
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let tray_menu = SystemTrayMenu::new()
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(quit);
+
+    let tray = SystemTray::new().with_menu(tray_menu);
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![open_stream, close_all_streams])
+        .system_tray(tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::LeftClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a left click");
+            }
+            SystemTrayEvent::RightClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a right click");
+            }
+            SystemTrayEvent::DoubleClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a double click");
+            }
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                // let item_handle = app.tray_handle().get_item(&id);
+                match id.as_str() {
+                    // "hide" => {
+                    //     let window = app.get_window("main").unwrap();
+                    //     window.hide().unwrap();
+                    //     // you can also `set_selected`, `set_enabled` and `set_native_image` (macOS only).
+                    //     item_handle.set_title("Show").unwrap();
+                    // }
+                    "quit" => {
+                        app.exit(0);
+                    }
+                    // "show" => {
+                    //     let window = app.get_window("main").unwrap();
+                    //     window.show().unwrap();
+                    //     item_handle.set_title("Hide").unwrap();
+                    // }
+                    _ => {
+                        println!("Clicked on menu item {}", id);
+                    }
+                }
+            }
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
