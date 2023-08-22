@@ -41,8 +41,8 @@
         "center": true,
         "alwaysOnTop": true,
         "title": "streamlink-tray",
-        "width": 400,
-        "height": 300,
+        "width": 500,
+        "height": 350,
         "visible": true
       }
     ],
