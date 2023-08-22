@@ -12,6 +12,11 @@ function App() {
     setMsg('Stream opened');
   }
 
+  async function close_all_streams() {
+    await invoke('close_all_streams');
+    setMsg('');
+  }
+
   return (
     <div className="container">
       <h1>Welcome to Tauri!</h1>
@@ -46,6 +51,8 @@ function App() {
       </form>
 
       <p>{msg}</p>
+
+      {!!msg && <button onClick={close_all_streams}>Close All</button>}
     </div>
   );
 }
