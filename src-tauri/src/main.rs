@@ -1,12 +1,9 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::process::Command;
 use std::thread;
-use tauri::Manager;
 use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn open_stream(input: &str) {
     let input_clone = input.to_string();
@@ -29,16 +26,13 @@ fn open_stream(input: &str) {
 
 #[tauri::command]
 fn close_all_streams() {
-    // Spawn a new thread to run the process termination
     thread::spawn(move || {
         if cfg!(target_os = "windows") {
-            // Terminate all Streamlink processes on Windows using Taskkill
             Command::new("cmd")
                 .args(&["/C", "taskkill /F /IM vlc.exe"])
                 .output()
                 .expect("failed to execute command");
         } else {
-            // Terminate all Streamlink processes on Unix-like systems using pkill
             Command::new("sh")
                 .arg("-c")
                 .arg("pkill -f vlc")
@@ -81,28 +75,14 @@ fn main() {
             } => {
                 println!("system tray received a double click");
             }
-            SystemTrayEvent::MenuItemClick { id, .. } => {
-                // let item_handle = app.tray_handle().get_item(&id);
-                match id.as_str() {
-                    // "hide" => {
-                    //     let window = app.get_window("main").unwrap();
-                    //     window.hide().unwrap();
-                    //     // you can also `set_selected`, `set_enabled` and `set_native_image` (macOS only).
-                    //     item_handle.set_title("Show").unwrap();
-                    // }
-                    "quit" => {
-                        app.exit(0);
-                    }
-                    // "show" => {
-                    //     let window = app.get_window("main").unwrap();
-                    //     window.show().unwrap();
-                    //     item_handle.set_title("Hide").unwrap();
-                    // }
-                    _ => {
-                        println!("Clicked on menu item {}", id);
-                    }
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => {
+                    app.exit(0);
                 }
-            }
+                _ => {
+                    println!("Clicked on menu item {}", id);
+                }
+            },
             _ => {}
         })
         .run(tauri::generate_context!())
