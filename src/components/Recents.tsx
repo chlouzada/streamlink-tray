@@ -130,7 +130,7 @@ export const Recents = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
+      <ScrollArea type="always" scrollbars="vertical" style={{ height: 250 }}>
         <Flex direction="column" gap="1" className="pr-3 pl-[1px]">
           {recents.map((name) => (
             <RecentItem name={name} />
