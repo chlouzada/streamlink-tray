@@ -18,15 +18,22 @@ import { useQuery } from '@tanstack/react-query';
 
 const baseApiUrl = 'https://streamlink-tray.vercel.app/api';
 
+const callRust = {
+  openStream: async (name: string) => {
+    await invoke<void>('open_stream', { input: name });
+  },
+  closeAllStreams: () => invoke<void>('close_all_streams'),
+};
+
 const useStart = () => {
   const { addRecent } = useRecentStore();
 
-  const start = async (name: string) => {
-    await invoke('open_stream', { input: name });
-    addRecent(name);
+  return {
+    start: async (name: string) => {
+      await callRust.openStream(name);
+      addRecent(name);
+    },
   };
-
-  return { start };
 };
 
 const RecentItem = ({ name }: { name: string }) => {
@@ -102,7 +109,7 @@ const RecentItem = ({ name }: { name: string }) => {
             <Flex className="items-center">
               <div
                 className={`rounded-full h-2 w-2 mr-1.5 ${
-                  isStreaming ? 'bg-red-500' : 'bg-gray-300'
+                  isStreaming ? 'bg-red-500' : 'bg-gray-200'
                 }`}
               />
               <Text size="2" weight="bold">
@@ -141,20 +148,32 @@ const RecentItem = ({ name }: { name: string }) => {
 const Recents = () => {
   const { recents, clearAllRecents } = useRecentStore();
 
-  if (recents.length === 0) return;
+  if (recents.length === 0)
+    return (
+      <Button
+        size="1"
+        onClick={callRust.closeAllStreams}
+        className="w-full mt-2"
+      >
+        Close All Streams
+      </Button>
+    );
 
   return (
     <div className="flex flex-col gap-2">
       <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
-        <Flex pr="4" direction="column" gap="1">
+        <Flex pr="3" direction="column" gap="1">
           {recents.map((name) => (
             <RecentItem name={name} />
           ))}
         </Flex>
       </ScrollArea>
-      <div className="flex w-full justify-end">
-        <Button size="1" onClick={clearAllRecents}>
-          Clear
+      <div className="flex gap-2">
+        <Button size="1" onClick={callRust.closeAllStreams} className="w-1/2">
+          Close All Streams
+        </Button>
+        <Button size="1" onClick={clearAllRecents} className="w-1/2">
+          Clear History
         </Button>
       </div>
     </div>
