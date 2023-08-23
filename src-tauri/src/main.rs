@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::process::Command;
+use std::os::windows::process::CommandExt;
+use std::process::{Command, Stdio};
 use std::thread;
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -14,13 +15,19 @@ fn open_stream(input: &str) {
         if cfg!(target_os = "windows") {
             Command::new("cmd")
                 .args(&["/C", &format!("streamlink twitch.tv/{} best", input_clone)])
-                .output()
+                .creation_flags(0x08000000)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()
                 .expect("failed to execute command")
         } else {
             Command::new("sh")
                 .arg("-c")
                 .arg(&format!("streamlink twitch.tv/{} best", input_clone))
-                .output()
+                .creation_flags(0x08000000)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()
                 .expect("failed to execute command")
         };
     });
