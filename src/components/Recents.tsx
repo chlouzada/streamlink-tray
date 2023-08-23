@@ -29,6 +29,7 @@ const RecentItem = ({ name }: { name: string }) => {
   const queryStream = useQuery({
     queryKey: ['stream', name],
     queryFn: async () => api.stream(name),
+    refetchInterval: 1000 * 60 * 5,
   });
 
   const isStreaming = !!queryStream.data?.type;
