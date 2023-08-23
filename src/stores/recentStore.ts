@@ -17,7 +17,7 @@ export const useRecentStore = create<RecentsState>((set) => ({
         RECENTS_KEY,
         JSON.stringify([recent, ...state.recents])
       );
-      return { recents: [recent, ...state.recents] };
+      return { recents: [...new Set([recent, ...state.recents])] };
     }),
   removeRecent: (recent) =>
     set((state) => {
