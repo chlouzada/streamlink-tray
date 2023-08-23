@@ -11,10 +11,24 @@ import {
   Text,
   TextField,
   ScrollArea,
+  IconButton,
 } from '@radix-ui/themes';
+import { Cross2Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 
-export const Recents = () => {
-  const { recents, clearAllRecents } = useRecentStore();
+const useStart = () => {
+  const { addRecent } = useRecentStore();
+
+  const start = async (name: string) => {
+    await invoke('open_stream', { input: name });
+    addRecent(name);
+  };
+
+  return { start };
+};
+
+const Recents = () => {
+  const { recents, clearAllRecents, removeRecent } = useRecentStore();
+  const { start } = useStart();
 
   if (recents.length === 0) return;
 
@@ -23,31 +37,44 @@ export const Recents = () => {
       <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
         <Flex pr="4" direction="column" gap="1">
           {recents.map((name) => (
-            <Card className="p-1">
-              <Flex gap="3" align="center">
-                <Avatar
-                  size="2"
-                  src="https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?&w=64&h=64&dpr=2&q=70&crop=focalpoint&fp-x=0.67&fp-y=0.5&fp-z=1.4&fit=crop"
-                  radius="full"
-                  fallback="T"
-                />
-                <Box>
-                  <Text as="div" size="2" weight="bold">
-                    {name}
-                  </Text>
-                  <Text as="div" size="1" color="gray">
-                    {/* TODO: */}
-                    Playing...
-                  </Text>
-                </Box>
-              </Flex>
+            <Card asChild className="p-1">
+              <a href="#" onClick={() => start(name)}>
+                <Flex gap="3" align="center">
+                  <Avatar
+                    size="2"
+                    src="https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?&w=64&h=64&dpr=2&q=70&crop=focalpoint&fp-x=0.67&fp-y=0.5&fp-z=1.4&fit=crop"
+                    radius="full"
+                    fallback="T"
+                  />
+                  <Box>
+                    <Text as="div" size="2" weight="bold">
+                      {name}
+                    </Text>
+                    <Text as="div" size="1" color="gray">
+                      {/* TODO: */}
+                      Playing...
+                    </Text>
+                  </Box>
+
+                  <IconButton
+                    className="ml-auto"
+                    size="1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeRecent(name);
+                    }}
+                  >
+                    <Cross2Icon />
+                  </IconButton>
+                </Flex>
+              </a>
             </Card>
           ))}
         </Flex>
       </ScrollArea>
       <div className="flex w-full justify-end">
         <Button size="1" onClick={clearAllRecents}>
-          Reset
+          Clear
         </Button>
       </div>
     </div>
@@ -56,15 +83,12 @@ export const Recents = () => {
 
 function App() {
   const [name, setName] = useState('');
-  const { addRecent } = useRecentStore();
+  const { start } = useStart();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!name) return;
-
-    await invoke('open_stream', { input: name });
-    addRecent(name);
+    start(name);
   };
 
   return (
