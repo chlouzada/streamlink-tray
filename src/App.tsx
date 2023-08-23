@@ -13,7 +13,10 @@ import {
   ScrollArea,
   IconButton,
 } from '@radix-ui/themes';
-import { Cross2Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { useQuery } from '@tanstack/react-query';
+
+const baseApiUrl = 'https://streamlink-tray.vercel.app/api';
 
 const useStart = () => {
   const { addRecent } = useRecentStore();
@@ -26,9 +29,74 @@ const useStart = () => {
   return { start };
 };
 
-const Recents = () => {
-  const { recents, clearAllRecents, removeRecent } = useRecentStore();
+const RecentItem = ({ name }: { name: string }) => {
+  const { removeRecent } = useRecentStore();
   const { start } = useStart();
+
+  const query = useQuery({
+    queryKey: ['streamer', name],
+    queryFn: async () => {
+      const result = await fetch(baseApiUrl + '/streamer?username=' + name, {
+        method: 'GET',
+      });
+      const data: {
+        id: string;
+        login: string;
+        display_name: string;
+        type: string;
+        broadcaster_type: string;
+        description: string;
+        profile_image_url: string;
+        offline_image_url: string;
+        view_count: number;
+        email: string;
+        created_at: string;
+      }[] = await result.json();
+      return data[0] ?? null;
+    },
+  });
+
+  return (
+    <Card asChild className="p-1">
+      <a href="#" onClick={() => start(name)}>
+        <Flex gap="3" align="center">
+          <Avatar
+            className={
+              query.isLoading ? 'animate-pulse rounded-md bg-muted' : ''
+            }
+            size="2"
+            src={query.data?.profile_image_url}
+            radius="full"
+            fallback={name[0]!}
+          />
+          <Box>
+            <Text as="div" size="2" weight="bold">
+              {query.data?.display_name ?? name}
+            </Text>
+            <Text as="div" size="1" color="gray">
+              {/* TODO: */}
+              Playing...
+            </Text>
+          </Box>
+
+          <IconButton
+            className="ml-auto"
+            size="1"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeRecent(name);
+            }}
+          >
+            <Cross2Icon />
+          </IconButton>
+        </Flex>
+      </a>
+    </Card>
+  );
+};
+
+const Recents = () => {
+  const { recents, clearAllRecents } = useRecentStore();
 
   if (recents.length === 0) return;
 
@@ -37,38 +105,7 @@ const Recents = () => {
       <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
         <Flex pr="4" direction="column" gap="1">
           {recents.map((name) => (
-            <Card asChild className="p-1">
-              <a href="#" onClick={() => start(name)}>
-                <Flex gap="3" align="center">
-                  <Avatar
-                    size="2"
-                    src="https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?&w=64&h=64&dpr=2&q=70&crop=focalpoint&fp-x=0.67&fp-y=0.5&fp-z=1.4&fit=crop"
-                    radius="full"
-                    fallback="T"
-                  />
-                  <Box>
-                    <Text as="div" size="2" weight="bold">
-                      {name}
-                    </Text>
-                    <Text as="div" size="1" color="gray">
-                      {/* TODO: */}
-                      Playing...
-                    </Text>
-                  </Box>
-
-                  <IconButton
-                    className="ml-auto"
-                    size="1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeRecent(name);
-                    }}
-                  >
-                    <Cross2Icon />
-                  </IconButton>
-                </Flex>
-              </a>
-            </Card>
+            <RecentItem name={name} />
           ))}
         </Flex>
       </ScrollArea>
@@ -87,7 +124,7 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name) return;
+    if (!name || !name.trim().length) return;
     start(name);
   };
 
