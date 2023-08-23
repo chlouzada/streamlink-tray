@@ -13,11 +13,10 @@ export const useRecentStore = create<RecentsState>((set) => ({
   recents: JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]') as string[],
   addRecent: (recent) =>
     set((state) => {
-      localStorage.setItem(
-        RECENTS_KEY,
-        JSON.stringify([recent, ...state.recents])
-      );
-      return { recents: [...new Set([recent, ...state.recents])] };
+      const set = new Set([recent, ...state.recents]);
+      const unique = [...set];
+      localStorage.setItem(RECENTS_KEY, JSON.stringify(unique));
+      return { recents: unique };
     }),
   removeRecent: (recent) =>
     set((state) => {
