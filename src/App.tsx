@@ -33,7 +33,7 @@ const RecentItem = ({ name }: { name: string }) => {
   const { removeRecent } = useRecentStore();
   const { start } = useStart();
 
-  const query = useQuery({
+  const queryStreamer = useQuery({
     queryKey: ['streamer', name],
     queryFn: async () => {
       const result = await fetch(baseApiUrl + '/streamer?username=' + name, {
@@ -56,27 +56,69 @@ const RecentItem = ({ name }: { name: string }) => {
     },
   });
 
+  const queryStream = useQuery({
+    queryKey: ['stream', name],
+    queryFn: async () => {
+      const result = await fetch(baseApiUrl + '/stream?username=' + name, {
+        method: 'GET',
+      });
+      const data: {
+        id: string;
+        user_id: string;
+        user_login: string;
+        user_name: string;
+        game_id: string;
+        game_name: string;
+        type: 'live';
+        title: string;
+        viewer_count: number;
+        started_at: string;
+        language: string;
+        thumbnail_url: string;
+        tag_ids: string[];
+        tags: string[];
+        is_mature: boolean;
+      }[] = await result.json();
+      return data[0] ?? null;
+    },
+  });
+
+  const isStreaming = !!queryStream.data?.type;
+
   return (
-    <Card asChild className="p-1">
+    <Card asChild>
       <a href="#" onClick={() => start(name)}>
         <Flex gap="3" align="center">
           <Avatar
             className={
-              query.isLoading ? 'animate-pulse rounded-md bg-muted' : ''
+              queryStreamer.isLoading ? 'animate-pulse rounded-md bg-muted' : ''
             }
             size="2"
-            src={query.data?.profile_image_url}
+            src={queryStreamer.data?.profile_image_url}
             radius="full"
             fallback={name[0]!}
           />
           <Box>
-            <Text as="div" size="2" weight="bold">
-              {query.data?.display_name ?? name}
-            </Text>
-            <Text as="div" size="1" color="gray">
-              {/* TODO: */}
-              Playing...
-            </Text>
+            <Flex className="items-center">
+              <div
+                className={`rounded-full h-2 w-2 mr-1.5 ${
+                  isStreaming ? 'bg-red-500' : 'bg-gray-300'
+                }`}
+              />
+              <Text size="2" weight="bold">
+                {queryStreamer.data?.display_name ?? name}
+              </Text>
+            </Flex>
+            {isStreaming && (
+              <>
+                <Text as="div" size="1" color="gray" className="mb-0.5">
+                  Playing {queryStream.data?.game_name}
+                </Text>
+                <Text as="div" size="1" weight="medium">
+                  {queryStream.data?.title}
+                </Text>
+              </>
+            )}
           </Box>
 
           <IconButton
@@ -86,6 +128,7 @@ const RecentItem = ({ name }: { name: string }) => {
               e.stopPropagation();
               removeRecent(name);
             }}
+            color="red"
           >
             <Cross2Icon />
           </IconButton>
