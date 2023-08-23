@@ -95,7 +95,7 @@ const RecentItem = ({ name }: { name: string }) => {
   const isStreaming = !!queryStream.data?.type;
 
   return (
-    <Card asChild>
+    <Card asChild className="hover:scale-[1.005] ">
       <a href="#" onClick={() => start(name)}>
         <HoverCard.Root>
           <Flex gap="3" align="center">
@@ -191,7 +191,7 @@ const Recents = () => {
   return (
     <div className="flex flex-col gap-2">
       <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
-        <Flex pr="3" direction="column" gap="1">
+        <Flex direction="column" gap="1" className="pr-3 pl-[1px]">
           {recents.map((name) => (
             <RecentItem name={name} />
           ))}
