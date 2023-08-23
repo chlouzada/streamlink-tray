@@ -12,9 +12,11 @@ import {
   TextField,
   ScrollArea,
   IconButton,
+  HoverCard,
 } from '@radix-ui/themes';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useQuery } from '@tanstack/react-query';
+import { getThumbnailSrc } from './utils/getThumbnailSrc';
 
 const baseApiUrl = 'https://streamlink-tray.vercel.app/api';
 
@@ -95,51 +97,78 @@ const RecentItem = ({ name }: { name: string }) => {
   return (
     <Card asChild>
       <a href="#" onClick={() => start(name)}>
-        <Flex gap="3" align="center">
-          <Avatar
-            className={
-              queryStreamer.isLoading ? 'animate-pulse rounded-md bg-muted' : ''
-            }
-            size="2"
-            src={queryStreamer.data?.profile_image_url}
-            radius="full"
-            fallback={name[0]!}
-          />
-          <Box>
-            <Flex className="items-center">
-              <div
-                className={`rounded-full h-2 w-2 mr-1.5 ${
-                  isStreaming ? 'bg-red-500' : 'bg-gray-200'
-                }`}
+        <HoverCard.Root>
+          <Flex gap="3" align="center">
+            <HoverCard.Trigger>
+              <Avatar
+                className={
+                  queryStreamer.isLoading
+                    ? 'animate-pulse rounded-md bg-muted'
+                    : ''
+                }
+                size="2"
+                src={queryStreamer.data?.profile_image_url}
+                radius="full"
+                fallback={name[0]!}
               />
-              <Text size="2" weight="bold">
-                {queryStreamer.data?.display_name ?? name}
-              </Text>
-            </Flex>
-            {isStreaming && (
-              <>
-                <Text as="div" size="1" color="gray" className="mb-0.5">
-                  Playing {queryStream.data?.game_name}
+            </HoverCard.Trigger>
+            <Box>
+              <Flex className="items-center">
+                <div
+                  className={`rounded-full h-2 w-2 mr-1.5 ${
+                    isStreaming ? 'bg-red-500' : 'bg-gray-200'
+                  }`}
+                />
+                <Text size="2" weight="bold">
+                  {queryStreamer.data?.display_name ?? name}
                 </Text>
-                <Text as="div" size="1" weight="medium">
-                  {queryStream.data?.title}
-                </Text>
-              </>
-            )}
-          </Box>
+              </Flex>
+              {isStreaming && (
+                <>
+                  <Text as="div" size="1" color="gray" className="mb-0.5">
+                    Playing {queryStream.data?.game_name}
+                  </Text>
 
-          <IconButton
-            className="ml-auto"
-            size="1"
-            onClick={(e) => {
-              e.stopPropagation();
-              removeRecent(name);
-            }}
-            color="red"
-          >
-            <Cross2Icon />
-          </IconButton>
-        </Flex>
+                  <Text as="div" size="1" weight="medium">
+                    {queryStream.data?.title}
+                  </Text>
+                </>
+              )}
+            </Box>
+
+            <IconButton
+              className="ml-auto"
+              size="1"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeRecent(name);
+              }}
+              color="red"
+            >
+              <Cross2Icon />
+            </IconButton>
+          </Flex>
+
+          {queryStream.data?.thumbnail_url && (
+            <HoverCard.Content>
+              <img
+                src={getThumbnailSrc({
+                  url: queryStream.data?.thumbnail_url,
+                  width: 640,
+                  height: 360,
+                })}
+                alt="stream thumbnail"
+                style={{
+                  display: 'block',
+                  objectFit: 'cover',
+                  height: '100%',
+                  width: 150,
+                  backgroundColor: 'var(--gray-5)',
+                }}
+              />
+            </HoverCard.Content>
+          )}
+        </HoverCard.Root>
       </a>
     </Card>
   );
