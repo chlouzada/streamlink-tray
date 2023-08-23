@@ -137,13 +137,21 @@ export const Recents = () => {
           ))}
         </Flex>
       </ScrollArea>
-      <div className="flex gap-2">
-        <Button size="1" onClick={callRust.closeAllStreams} className="w-1/2">
-          Close All Streams
-        </Button>
-        <Button size="1" onClick={clearAllRecents} className="w-1/2">
-          Clear History
-        </Button>
+      <div className="flex grow gap-2">
+        <div className="w-full">
+          <Button
+            size="1"
+            onClick={callRust.closeAllStreams}
+            className="w-full"
+          >
+            Close All Streams
+          </Button>
+        </div>
+        <div className="w-full">
+          <Button size="1" onClick={clearAllRecents} className="w-full">
+            Clear History
+          </Button>
+        </div>
       </div>
     </div>
   );
