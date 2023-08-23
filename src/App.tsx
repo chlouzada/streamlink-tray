@@ -16,31 +16,41 @@ import {
 export const Recents = () => {
   const { recents, clearAllRecents } = useRecentStore();
 
+  if (recents.length === 0) return;
+
   return (
-    <ScrollArea type="always" scrollbars="vertical" style={{ height: 200 }}>
-      <Box pr="4">
-        {recents.map((name) => (
-          <Card className="p-1">
-            <Flex gap="3" align="center">
-              <Avatar
-                size="2"
-                src="https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?&w=64&h=64&dpr=2&q=70&crop=focalpoint&fp-x=0.67&fp-y=0.5&fp-z=1.4&fit=crop"
-                radius="full"
-                fallback="T"
-              />
-              <Box>
-                <Text as="div" size="2" weight="bold">
-                  {name}
-                </Text>
-                <Text as="div" size="1" color="gray">
-                  Playing...
-                </Text>
-              </Box>
-            </Flex>
-          </Card>
-        ))}
-      </Box>
-    </ScrollArea>
+    <div className="flex flex-col gap-2">
+      <ScrollArea type="always" scrollbars="vertical" style={{ height: 220 }}>
+        <Flex pr="4" direction="column" gap="1">
+          {recents.map((name) => (
+            <Card className="p-1">
+              <Flex gap="3" align="center">
+                <Avatar
+                  size="2"
+                  src="https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?&w=64&h=64&dpr=2&q=70&crop=focalpoint&fp-x=0.67&fp-y=0.5&fp-z=1.4&fit=crop"
+                  radius="full"
+                  fallback="T"
+                />
+                <Box>
+                  <Text as="div" size="2" weight="bold">
+                    {name}
+                  </Text>
+                  <Text as="div" size="1" color="gray">
+                    {/* TODO: */}
+                    Playing...
+                  </Text>
+                </Box>
+              </Flex>
+            </Card>
+          ))}
+        </Flex>
+      </ScrollArea>
+      <div className="flex w-full justify-end">
+        <Button size="1" onClick={clearAllRecents}>
+          Reset
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -58,8 +68,8 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-full justify-center">
-      <form className="flex justify-center gap-2 mb-6" onSubmit={handleSubmit}>
+    <Container className="min-h-screen flex flex-col justify-center" size="1">
+      <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
         <TextField.Root className="w-full">
           <TextField.Input
             size="3"
@@ -72,7 +82,7 @@ function App() {
         </Button>
       </form>
       <Recents />
-    </div>
+    </Container>
   );
 }
 
