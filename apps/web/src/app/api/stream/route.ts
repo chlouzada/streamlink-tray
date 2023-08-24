@@ -1,6 +1,5 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable no-undef */
-/* eslint-disable turbo/no-undeclared-env-vars */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -71,7 +70,7 @@ export async function GET(request: Request) {
     },
   });
 
-  const data = await result.json() as {
+  const data = (await result.json()) as {
     data: Stream[];
   };
 

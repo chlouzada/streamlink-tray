@@ -1,7 +1,8 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable no-undef */
-/* eslint-disable turbo/no-undeclared-env-vars */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
+import { raises } from './raises';
+
 class Cache {
   authorization: string;
   expires: number;
@@ -9,17 +10,18 @@ class Cache {
 
 let cache: Cache | undefined;
 
-export const getTwitchAuthorization = async () : Promise<string> => {
+const twitchClientId =
+  process.env.TWITCH_CLIENT_ID ?? raises('TWITCH_CLIENT_ID not set');
+const twitchClientSecret =
+  process.env.TWITCH_CLIENT_SECRET ?? raises('TWITCH_CLIENT_SECRET not set');
+
+export const getTwitchAuthorization = async (): Promise<string> => {
   if (cache && cache.expires > Date.now()) {
     return cache.authorization;
   }
 
   const result = await fetch(
-    `https://id.twitch.tv/oauth2/token?client_id=${
-   process.env.TWITCH_CLIENT_ID!
-    }&client_secret=${
-    process.env.TWITCH_CLIENT_SECRET!
-    }&grant_type=client_credentials`,
+    `https://id.twitch.tv/oauth2/token?client_id=${twitchClientId}&client_secret=${twitchClientSecret}&grant_type=client_credentials`,
     {
       method: 'POST',
     }
