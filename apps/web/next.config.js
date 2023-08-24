@@ -8,7 +8,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:1420',
+            value: '*',
           },
         ],
       },
