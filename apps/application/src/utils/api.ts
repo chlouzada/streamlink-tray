@@ -1,4 +1,5 @@
-const baseApiUrl = 'https://streamlink-tray.vercel.app/api';
+// const baseApiUrl = 'https://streamlink-tray.vercel.app/api';
+const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
 
 type Streamer = {
   id: string;

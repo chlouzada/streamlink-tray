@@ -1,5 +1,11 @@
-import { getTwitchAuthorization } from '@/utils/getTwitchAuthorization';
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable no-undef */
+/* eslint-disable turbo/no-undeclared-env-vars */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { NextResponse } from 'next/server';
+import { getTwitchAuthorization } from '../../../utils/get-twitch-authorization';
 
 type Stream = {
   id: string;
@@ -57,7 +63,7 @@ export async function GET(request: Request) {
 
   const toQuery = filteredNames.map((item) => `user_login=${item}`).join('&');
 
-  const result = await fetch('https://api.twitch.tv/helix/streams?' + toQuery, {
+  const result = await fetch(`https://api.twitch.tv/helix/streams?${toQuery}`, {
     method: 'GET',
     headers: {
       'Client-ID': process.env.TWITCH_CLIENT_ID!,
@@ -65,9 +71,9 @@ export async function GET(request: Request) {
     },
   });
 
-  const data: {
+  const data = await result.json() as {
     data: Stream[];
-  } = await result.json();
+  };
 
   const fetchedStreams = data.data;
 
