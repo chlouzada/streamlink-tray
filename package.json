@@ -5,7 +5,10 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "version:patch": "cd apps/application && npm version patch --no-git-tag-version",
+    "version:minor": "cd apps/application && npm version patch --no-git-tag-version",
+    "version:major": "cd apps/application && npm version patch --no-git-tag-version"
   },
   "devDependencies": {
     "eslint": "^8.47.0",
@@ -13,7 +16,6 @@
     "tsconfig": "*",
     "turbo": "latest"
   },
-
   "packageManager": "npm@9.5.0",
   "workspaces": [
     "apps/*",
