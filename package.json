@@ -7,8 +7,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "version:patch": "cd apps/application && npm version patch --no-git-tag-version",
-    "version:minor": "cd apps/application && npm version patch --no-git-tag-version",
-    "version:major": "cd apps/application && npm version patch --no-git-tag-version"
+    "version:minor": "cd apps/application && npm version minor --no-git-tag-version",
+    "version:major": "cd apps/application && npm version major --no-git-tag-version"
   },
   "devDependencies": {
     "eslint": "^8.47.0",
