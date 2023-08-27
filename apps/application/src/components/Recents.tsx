@@ -17,63 +17,50 @@ import { getThumbnailSrc } from '../utils/getThumbnailSrc';
 import { useStartStream } from '../hooks/useStartStream';
 import { api } from '../utils/api';
 
-const RecentItem = ({ name }: { name: string }) => {
+const LiveRecentItem = ({
+  username,
+  displayName,
+  game,
+  title,
+  avatarUrl,
+  thumbnailUrl,
+}: {
+  username: string;
+  displayName: string;
+  game: string;
+  title: string;
+  avatarUrl: string;
+  thumbnailUrl: string;
+}) => {
   const { removeRecent } = useRecentStore();
   const { start } = useStartStream();
 
-  const queryStreamer = useQuery({
-    queryKey: ['streamer', name],
-    queryFn: async () => api.streamer(name),
-  });
-
-  const queryStream = useQuery({
-    queryKey: ['stream', name],
-    queryFn: async () => api.stream(name),
-    refetchInterval: 1000 * 60 * 5,
-  });
-
-  const isStreaming = !!queryStream.data?.type;
-
   return (
     <Card asChild className="hover:scale-[1.005] ">
-      <a href="#" onClick={() => start(name)}>
+      <a href="#" onClick={() => start(username)}>
         <HoverCard.Root>
           <Flex gap="3" align="center">
             <HoverCard.Trigger>
               <Avatar
-                className={
-                  queryStreamer.isLoading
-                    ? 'animate-pulse rounded-md bg-muted'
-                    : ''
-                }
                 size="2"
-                src={queryStreamer.data?.profile_image_url}
+                src={avatarUrl}
                 radius="full"
-                fallback={name[0]!}
+                fallback={username[0]!}
               />
             </HoverCard.Trigger>
             <Box>
               <Flex className="items-center">
-                <div
-                  className={`rounded-full h-2 w-2 mr-1.5 ${
-                    isStreaming ? 'bg-red-500' : 'bg-gray-200'
-                  }`}
-                />
+                <div className="rounded-full h-2 w-2 mr-1.5 bg-red-500" />
                 <Text size="2" weight="bold">
-                  {queryStreamer.data?.display_name ?? name}
+                  {displayName}
                 </Text>
               </Flex>
-              {isStreaming && (
-                <>
-                  <Text as="div" size="1" color="gray" className="mb-0.5">
-                    Playing {queryStream.data?.game_name}
-                  </Text>
-
-                  <Text as="div" size="1" weight="medium">
-                    {queryStream.data?.title}
-                  </Text>
-                </>
-              )}
+              <Text as="div" size="1" color="gray" className="mb-0.5">
+                Playing {game}
+              </Text>
+              <Text as="div" size="1" weight="medium">
+                {title}
+              </Text>
             </Box>
 
             <IconButton
@@ -81,7 +68,7 @@ const RecentItem = ({ name }: { name: string }) => {
               size="1"
               onClick={(e) => {
                 e.stopPropagation();
-                removeRecent(name);
+                removeRecent(username);
               }}
               color="red"
             >
@@ -89,28 +76,93 @@ const RecentItem = ({ name }: { name: string }) => {
             </IconButton>
           </Flex>
 
-          {queryStream.data?.thumbnail_url && (
-            <HoverCard.Content>
-              <img
-                src={getThumbnailSrc({
-                  url: queryStream.data?.thumbnail_url,
-                  width: 640,
-                  height: 360,
-                })}
-                alt="stream thumbnail"
-                style={{
-                  display: 'block',
-                  objectFit: 'cover',
-                  height: '100%',
-                  width: 150,
-                  backgroundColor: 'var(--gray-5)',
-                }}
-              />
-            </HoverCard.Content>
-          )}
+          <HoverCard.Content>
+            <img
+              src={getThumbnailSrc({
+                url: thumbnailUrl,
+                width: 640,
+                height: 360,
+              })}
+              alt="stream thumbnail"
+              style={{
+                display: 'block',
+                objectFit: 'cover',
+                height: '100%',
+                width: 150,
+                backgroundColor: 'var(--gray-5)',
+              }}
+            />
+          </HoverCard.Content>
         </HoverCard.Root>
       </a>
     </Card>
+  );
+};
+
+const OfflineRecentItem = ({
+  username,
+  displayName,
+}: {
+  username: string;
+  displayName: string;
+}) => {
+  const { removeRecent } = useRecentStore();
+
+  return (
+    <Card asChild>
+      <div>
+        <div className="w-full flex justify-between grow">
+          <Flex className="items-center">
+            <Text size="2" weight="bold">
+              {displayName ?? username}
+            </Text>
+          </Flex>
+
+          <IconButton
+            className="ml-auto"
+            size="1"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeRecent(username);
+            }}
+            color="red"
+          >
+            <Cross2Icon />
+          </IconButton>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const RecentItem = ({ name }: { name: string }) => {
+  const { data: streamer } = useQuery({
+    queryKey: ['streamer', name],
+    queryFn: async () => api.streamer(name),
+  });
+
+  const { data: stream } = useQuery({
+    queryKey: ['stream', name],
+    queryFn: async () => api.stream(name),
+    refetchInterval: 1000 * 60 * 5,
+  });
+
+  const isStreaming = !!stream?.type;
+
+  return isStreaming ? (
+    <LiveRecentItem
+      username={streamer?.login ?? name}
+      displayName={streamer?.display_name ?? name}
+      avatarUrl={streamer?.profile_image_url ?? ''}
+      game={stream.game_name}
+      title={stream.title}
+      thumbnailUrl={stream.thumbnail_url}
+    />
+  ) : (
+    <OfflineRecentItem
+      username={streamer?.login ?? name}
+      displayName={streamer?.display_name ?? name}
+    />
   );
 };
 
