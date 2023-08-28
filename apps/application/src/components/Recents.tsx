@@ -12,11 +12,9 @@ import {
 import { useRecentStore } from '../stores/recentStore';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useQuery } from '@tanstack/react-query';
-import { callRust } from '../utils/callRust';
 import { getThumbnailSrc } from '../utils/getThumbnailSrc';
 import { useStream } from '../hooks/useStream';
 import { api } from '../utils/api';
-import { toast } from 'react-toastify';
 
 const LiveRecentItem = ({
   username,
