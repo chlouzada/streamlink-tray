@@ -14,8 +14,9 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useQuery } from '@tanstack/react-query';
 import { callRust } from '../utils/callRust';
 import { getThumbnailSrc } from '../utils/getThumbnailSrc';
-import { useStartStream } from '../hooks/useStartStream';
+import { useStream } from '../hooks/useStream';
 import { api } from '../utils/api';
+import { toast } from 'react-toastify';
 
 const LiveRecentItem = ({
   username,
@@ -33,7 +34,7 @@ const LiveRecentItem = ({
   thumbnailUrl: string;
 }) => {
   const { removeRecent } = useRecentStore();
-  const { start } = useStartStream();
+  const { start } = useStream();
 
   return (
     <Card asChild className="hover:scale-[1.005] ">
@@ -168,14 +169,11 @@ const RecentItem = ({ name }: { name: string }) => {
 
 export const Recents = () => {
   const { recents, clearAllRecents } = useRecentStore();
+  const { closeAll } = useStream();
 
   if (recents.length === 0)
     return (
-      <Button
-        size="1"
-        onClick={callRust.closeAllStreams}
-        className="w-full mt-2"
-      >
+      <Button size="1" onClick={closeAll} className="w-full mt-2">
         Close All Streams
       </Button>
     );
@@ -191,11 +189,7 @@ export const Recents = () => {
       </ScrollArea>
       <div className="flex grow gap-2">
         <div className="w-full">
-          <Button
-            size="1"
-            onClick={callRust.closeAllStreams}
-            className="w-full"
-          >
+          <Button size="1" onClick={closeAll} className="w-full">
             Close All Streams
           </Button>
         </div>

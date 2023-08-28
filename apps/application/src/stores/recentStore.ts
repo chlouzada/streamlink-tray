@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'react-toastify';
 
 const RECENTS_KEY = 'recents';
 
@@ -28,5 +29,6 @@ export const useRecentStore = create<RecentsState>((set) => ({
   clearAllRecents: () => {
     set({ recents: [] });
     localStorage.removeItem(RECENTS_KEY);
+    toast(`Cleared all recents`);
   },
 }));

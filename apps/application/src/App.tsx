@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Container, Button, TextField } from '@radix-ui/themes';
 import { Recents } from './components/Recents';
-import { useStartStream } from './hooks/useStartStream';
+import { useStream } from './hooks/useStream';
 
 function App() {
   const [name, setName] = useState('');
-  const { start } = useStartStream();
+  const { start } = useStream();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
