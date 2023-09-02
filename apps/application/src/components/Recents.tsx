@@ -4,7 +4,6 @@ import {
   Flex,
   Avatar,
   Box,
-  Card,
   HoverCard,
   IconButton,
   Text,
