@@ -35,8 +35,7 @@ const LiveRecentItem = ({
   const { start } = useStream();
 
   return (
-    <Card asChild className="hover:scale-[1.005] ">
-      <a href="#" onClick={() => start(username)}>
+      <a href="#" className="hover:scale-[1.005] border border-gray-300 rounded-lg px-2 py-1"  onClick={() => start(username)}>
         <HoverCard.Root>
           <Flex gap="3" align="center">
             <HoverCard.Trigger>
@@ -94,7 +93,6 @@ const LiveRecentItem = ({
           </HoverCard.Content>
         </HoverCard.Root>
       </a>
-    </Card>
   );
 };
 
@@ -108,8 +106,7 @@ const OfflineRecentItem = ({
   const { removeRecent } = useRecentStore();
 
   return (
-    <Card asChild>
-      <div>
+      <div className='border border-gray-300 rounded-lg px-2 py-1'>
         <div className="w-full flex justify-between grow">
           <Flex className="items-center">
             <Text size="2" weight="bold">
@@ -130,7 +127,6 @@ const OfflineRecentItem = ({
           </IconButton>
         </div>
       </div>
-    </Card>
   );
 };
 
