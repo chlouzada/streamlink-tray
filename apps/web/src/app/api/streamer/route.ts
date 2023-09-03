@@ -34,6 +34,24 @@ const getStreamersFromCache = (usernames: string[]) => {
   return result;
 };
 
+export const getStreamers = async (usernames: string[]) => {
+  const query = usernames.map((name) => `login=${name}`).join('&');
+
+  const result = await fetch(`https://api.twitch.tv/helix/users?${query}`, {
+    method: 'GET',
+    headers: {
+      'Client-ID': process.env.TWITCH_CLIENT_ID!,
+      Authorization: await getTwitchAuthorization(),
+    },
+  });
+
+  const data = (await result.json()) as {
+    data: Streamer[];
+  };
+
+  return data.data;
+};
+
 export async function GET(request: Request) {
   const params = new URLSearchParams(request.url.split('?').pop());
   const usernames = params.getAll('username');
@@ -48,29 +66,11 @@ export async function GET(request: Request) {
     return NextResponse.json(cachedStreamers);
   }
 
-  const filteredNames = usernames.filter((name) => {
-    const cached = cache.get(name);
-    if (cached && cached.expires > Date.now()) {
-      return false;
-    }
-    return true;
-  });
+  const filteredNames = usernames.filter(
+    (username) => !cachedStreamers.map((item) => item.login).includes(username)
+  );
 
-  const toQuery = filteredNames.map((name) => `login=${name}`).join('&');
-
-  const result = await fetch(`https://api.twitch.tv/helix/users?${toQuery}`, {
-    method: 'GET',
-    headers: {
-      'Client-ID': process.env.TWITCH_CLIENT_ID!,
-      Authorization: await getTwitchAuthorization(),
-    },
-  });
-
-  const data = (await result.json()) as {
-    data: Streamer[];
-  };
-
-  const fetchedStreamers = data.data;
+  const fetchedStreamers = await getStreamers(filteredNames);
 
   for (const streamer of fetchedStreamers) {
     cache.set(streamer.login, {
