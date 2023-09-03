@@ -67,26 +67,27 @@ fn main() {
         .invoke_handler(tauri::generate_handler![open_stream, close_all_streams])
         .system_tray(tray)
         .on_system_tray_event(|app, event| match event {
-            SystemTrayEvent::LeftClick {
-                position: _,
-                size: _,
-                ..
-            } => {
-                println!("system tray received a left click");
-            }
-            SystemTrayEvent::RightClick {
-                position: _,
-                size: _,
-                ..
-            } => {
-                println!("system tray received a right click");
-            }
+            // SystemTrayEvent::LeftClick {
+            //     position: _,
+            //     size: _,
+            //     ..
+            // } => {
+            //     println!("system tray received a left click");
+            // }
+            // SystemTrayEvent::RightClick {
+            //     position: _,
+            //     size: _,
+            //     ..
+            // } => {
+            //     println!("system tray received a right click");
+            // }
             SystemTrayEvent::DoubleClick {
                 position: _,
                 size: _,
                 ..
             } => {
-                println!("system tray received a double click");
+                let window = app.get_window("main").unwrap();
+                window.show().unwrap();
             }
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
                 "open" => {
