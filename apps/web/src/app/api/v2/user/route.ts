@@ -70,24 +70,25 @@ export async function GET(request: Request) {
   const cachedStreamers = getFromCache(usernames, cache.streamer);
   const cachedStreams = getFromCache(usernames, cache.stream);
 
-  const fetchedStreamers = await run(async () => {
-    const toFetchStreamers = usernames.filter(
-      (username) =>
-        !cachedStreamers.map((item) => item.login).includes(username)
-    );
-    if (toFetchStreamers.length === 0) return [];
-    return getStreamers(toFetchStreamers);
-  });
-
-  const fetchedStreams = await run(async () => {
-    const toFetchStreams = usernames.filter(
-      (username) =>
-        !cachedStreams.map((item) => item.user_login).includes(username)
-    );
-    if (toFetchStreams.length === 0) return [];
-    return getStreams(toFetchStreams);
-  });
-
+  const [fetchedStreamers, fetchedStreams] = await Promise.all([
+    runAsync(async () => {
+      const toFetchStreamers = usernames.filter(
+        (username) =>
+          !cachedStreamers.map((item) => item.login).includes(username)
+      );
+      if (toFetchStreamers.length === 0) return [];
+      return getStreamers(toFetchStreamers);
+    }),
+    runAsync(async () => {
+      const toFetchStreams = usernames.filter(
+        (username) =>
+          !cachedStreams.map((item) => item.user_login).includes(username)
+      );
+      if (toFetchStreams.length === 0) return [];
+      return getStreams(toFetchStreams);
+    }),
+  ]);
+  
   for (const streamer of fetchedStreamers) {
     cache.streamer.set(streamer.login, {
       data: streamer,
@@ -127,4 +128,4 @@ export async function GET(request: Request) {
   return NextResponse.json(result);
 }
 
-const run = async <T>(fn: () => Promise<T>) => fn();
+const runAsync = async <T>(fn: () => Promise<T>) => fn();
