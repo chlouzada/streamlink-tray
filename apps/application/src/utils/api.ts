@@ -33,6 +33,16 @@ type Stream = {
   is_mature: boolean;
 };
 
+export type User = {
+  username: string;
+  avatarUrl: string;
+  displayName: string;
+  status: 'LIVE' | 'OFFLINE';
+  game?: string;
+  title?: string;
+  thumbnailUrl?: string;
+};
+
 export const api = {
   streamer: async (username: string) => {
     const result = await fetch(baseApiUrl + '/streamer?username=' + username, {
@@ -48,5 +58,18 @@ export const api = {
     });
     const data: Stream[] = await result.json();
     return data[0] ?? null;
+  },
+
+  v2: {
+    user: async (username: string[]) => {
+      const query = username.map((name) => `username=${name}`).join('&');
+      const result = await fetch(`${baseApiUrl}/v2/user?${query}`, {
+        method: 'GET',
+      });
+      const data: {
+        [key: string]: User;
+      } = await result.json();
+      return data;
+    },
   },
 };
