@@ -4,7 +4,6 @@
 import { NextResponse } from 'next/server';
 import { getStreams } from '../../stream/route';
 import { getStreamers } from '../../streamer/route';
-import { raises } from '../../../../utils/raises';
 
 type Streamer = {
   id: string;
@@ -70,25 +69,31 @@ export async function GET(request: Request) {
   const cachedStreamers = getFromCache(usernames, cache.streamer);
   const cachedStreams = getFromCache(usernames, cache.stream);
 
-  const [fetchedStreamers, fetchedStreams] = await Promise.all([
-    runAsync(async () => {
-      const toFetchStreamers = usernames.filter(
-        (username) =>
-          !cachedStreamers.map((item) => item.login).includes(username)
-      );
-      if (toFetchStreamers.length === 0) return [];
-      return getStreamers(toFetchStreamers);
-    }),
-    runAsync(async () => {
-      const toFetchStreams = usernames.filter(
-        (username) =>
-          !cachedStreams.map((item) => item.user_login).includes(username)
-      );
-      if (toFetchStreams.length === 0) return [];
-      return getStreams(toFetchStreams);
-    }),
-  ]);
-  
+  const fetchedStreamers = await runAsync(async () => {
+    const toFetchStreamers = usernames.filter(
+      (username) =>
+        !cachedStreamers.map((item) => item.login).includes(username)
+    );
+    if (toFetchStreamers.length === 0) return [];
+    return getStreamers(toFetchStreamers);
+  });
+
+  const streamers = [...cachedStreamers, ...fetchedStreamers];
+
+  const fetchedStreams = await runAsync(async () => {
+    const toFetchStreams = usernames.filter((username) => {
+      const couldFindStreamer = streamers
+        .map((item) => item.login)
+        .includes(username);
+      const isNotCached = !cachedStreams
+        .map((item) => item.user_login)
+        .includes(username);
+      return couldFindStreamer && isNotCached;
+    });
+    if (toFetchStreams.length === 0) return [];
+    return getStreams(toFetchStreams);
+  });
+
   for (const streamer of fetchedStreamers) {
     cache.streamer.set(streamer.login, {
       data: streamer,
@@ -103,28 +108,29 @@ export async function GET(request: Request) {
     });
   }
 
-  const streamers = [...cachedStreamers, ...fetchedStreamers];
   const streams = [...cachedStreams, ...fetchedStreams];
 
-  
-
   const result = Object.fromEntries(
-    usernames.map((username) =>{
-
-      const streamer = streamers.find((item) => item.login === username) ?? raises('Streamer not found');
+    usernames.map((username) => {
+      const streamer = streamers.find((item) => item.login === username);
       const stream = streams.find((item) => item.user_login === username);
 
-      return [username, {
-        username: streamer.login,
-        avatarUrl: streamer.profile_image_url,
-        displayName: streamer.display_name,
-        status: stream ? "LIVE" : "OFFLINE",
-        game: stream?.game_name,
-        title: stream?.title,
-        thumbnailUrl: stream?.thumbnail_url,
-      }]
+      if (!streamer) return [username, undefined];
+
+      return [
+        username,
+        {
+          username: streamer.login,
+          avatarUrl: streamer.profile_image_url,
+          displayName: streamer.display_name,
+          status: stream ? 'LIVE' : 'OFFLINE',
+          game: stream?.game_name,
+          title: stream?.title,
+          thumbnailUrl: stream?.thumbnail_url,
+        },
+      ];
     })
-  );''
+  );
 
   return NextResponse.json(result);
 }
