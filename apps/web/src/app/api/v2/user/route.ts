@@ -118,6 +118,7 @@ export async function GET(request: Request) {
         username: streamer.login,
         avatarUrl: streamer.profile_image_url,
         displayName: streamer.display_name,
+        status: stream ? "LIVE" : "OFFLINE",
         game: stream?.game_name,
         title: stream?.title,
         thumbnailUrl: stream?.thumbnail_url,
