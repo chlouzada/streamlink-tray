@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Button, TextField } from '@radix-ui/themes';
+import { Container, Button, TextField } from '@radix-ui/themes';
+import { Login } from '../components/Login';
 import { useStream } from '../hooks/useStream';
-import { Recents } from '../components/Recents';
-import { Link } from '../router';
 
 function App() {
   const [name, setName] = useState('');
@@ -14,7 +13,11 @@ function App() {
     start(name);
   };
   return (
-<>      <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
+    <Container className="min-h-screen flex flex-col justify-center" size="1">
+      <></>
+      <Login/>
+
+      {/* <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
         <TextField.Root className="w-full">
           <TextField.Input
             size="3"
@@ -26,9 +29,8 @@ function App() {
           Start
         </Button>
       </form>
-      <Link to='/teste' >to test</Link>
-      <Recents />
-    </>
+      <Recents /> */}
+    </Container>
   );
 }
 
