@@ -1,17 +1,17 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 import { Theme } from '@radix-ui/themes';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { Routes } from '@generouted/react-router'
+import App from './App';
 import { queryClient } from './utils/queryClient';
 
 import '@radix-ui/themes/styles.css';
 import './styles.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { Cross2Icon } from '@radix-ui/react-icons';
 
-createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Theme
@@ -20,7 +20,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
         panelBackground="solid"
         radius="large"
       >
-        <Routes />
+        <App />
         <ToastContainer
           {...{
             pauseOnFocusLoss: false,

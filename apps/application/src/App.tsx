@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container, Button, TextField } from '@radix-ui/themes';
-import { Login } from '../components/Login';
-import { useStream } from '../hooks/useStream';
+import { Recents } from './components/Recents';
+import { useStream } from './hooks/useStream';
 
 function App() {
   const [name, setName] = useState('');
@@ -12,12 +12,10 @@ function App() {
     if (!name || !name.trim().length) return;
     start(name);
   };
+
   return (
     <Container className="min-h-screen flex flex-col justify-center" size="1">
-
-      <Login/>
-
-      {/* <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
+      <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
         <TextField.Root className="w-full">
           <TextField.Input
             size="3"
@@ -29,7 +27,7 @@ function App() {
           Start
         </Button>
       </form>
-      <Recents /> */}
+      <Recents />
     </Container>
   );
 }

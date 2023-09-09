@@ -13,7 +13,6 @@
     "postversion": "node ./scripts/sync-version.js"
   },
   "dependencies": {
-    "@generouted/react-router": "^1.15.7",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/themes": "^1.1.2",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
@@ -22,7 +21,6 @@
     "@tauri-apps/api": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.15.0",
     "zustand": "^4.4.1"
   },
   "devDependencies": {
