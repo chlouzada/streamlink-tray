@@ -4,7 +4,7 @@ import { useStream } from '../hooks/useStream';
 import { Recents } from '../components/Recents';
 import { Link } from '../router';
 
-function App() {
+function Home() {
   const [name, setName] = useState('');
   const { start } = useStream();
 
@@ -13,8 +13,10 @@ function App() {
     if (!name || !name.trim().length) return;
     start(name);
   };
+  
   return (
-<>      <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
+    <>
+      <form className="flex justify-center gap-2 mb-2" onSubmit={handleSubmit}>
         <TextField.Root className="w-full">
           <TextField.Input
             size="3"
@@ -26,10 +28,10 @@ function App() {
           Start
         </Button>
       </form>
-      <Link to='/teste' >to test</Link>
+      <Link to="/teste">to teste 2</Link>
       <Recents />
     </>
   );
 }
 
-export default App;
+export default Home;

@@ -1,15 +1,18 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { Theme } from '@radix-ui/themes';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { Routes } from '@generouted/react-router'
 import { queryClient } from './utils/queryClient';
+import { RouterProvider, createHashRouter } from 'react-router-dom';
+import { routes } from '@generouted/react-router';
 
 import '@radix-ui/themes/styles.css';
 import './styles.css';
 import 'react-toastify/dist/ReactToastify.css';
+
+const router = createHashRouter(routes);
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -20,7 +23,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
         panelBackground="solid"
         radius="large"
       >
-        <Routes />
+        <RouterProvider router={router} />
         <ToastContainer
           {...{
             pauseOnFocusLoss: false,

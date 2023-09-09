@@ -1,12 +1,7 @@
 import { Link } from '../router';
 
-function App() {
-  return (
-    <>
-      xxxx
-      <Link to="/">to home</Link>
-    </>
-  );
+function Teste() {
+  return <Link to="/">to index</Link>;
 }
 
-export default App;
+export default Teste;
