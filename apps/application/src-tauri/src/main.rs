@@ -61,7 +61,9 @@ fn main() {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
-    let tray = SystemTray::new().with_menu(tray_menu);
+    let tray = SystemTray::new()
+        .with_menu(tray_menu)
+        .with_tooltip("Streamlink Tray");
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![open_stream, close_all_streams])

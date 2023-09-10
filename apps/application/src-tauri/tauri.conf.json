@@ -33,7 +33,7 @@
         "minimizable": false,
         "center": true,
         "alwaysOnTop": true,
-        "title": "streamlink-tray",
+        "title": "Streamlink Tray",
         "width": 470,
         "height": 350,
         "visible": true
