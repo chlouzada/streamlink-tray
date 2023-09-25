@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-latest]
+        platform: [windows-latest, ubuntu-20.04]
     env:
       working-directory: ./apps/application
 
