@@ -1,35 +1,40 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::os::windows::process::CommandExt;
 use std::process::{Command, Stdio};
 use std::thread;
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
 #[tauri::command]
 fn open_stream(input: &str) {
     let input_clone = input.to_string();
 
     thread::spawn(move || {
+        let mut cmd: Command;
         if cfg!(target_os = "windows") {
-            Command::new("cmd")
-                .args(&["/C", &format!("streamlink twitch.tv/{} best", input_clone)])
-                .creation_flags(0x08000000)
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .expect("failed to execute command")
+            cmd = Command::new("cmd");
+            cmd.args(&["/C", &format!("streamlink twitch.tv/{} best", input_clone)]);
         } else {
-            Command::new("sh")
-                .arg("-c")
-                .arg(&format!("streamlink twitch.tv/{} best", input_clone))
-                .creation_flags(0x08000000)
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .expect("failed to execute command")
-        };
+            cmd = Command::new("sh");
+            cmd.arg("-c")
+                .arg(&format!("streamlink twitch.tv/{} best", input_clone));
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            let mut cmd_ref = &mut cmd;
+            cmd_ref = cmd_ref.creation_flags(0x08000000);
+            println!("{:?}", cmd_ref); // FIXME: remove the warning
+        }
+
+        cmd.stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("failed to execute command");
     });
 }
 
